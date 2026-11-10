@@ -1,11 +1,9 @@
-
 import os
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
 import sys
-
 
 def limpiar():
     os.system("cls" if os.name == "nt" else "clear")
