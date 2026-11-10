@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import sys
 
+
 def validar_n():
     """Solicita y valida el número de vértices entre 5 y 15"""
     while True:
