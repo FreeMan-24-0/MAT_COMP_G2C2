@@ -1,13 +1,17 @@
+import os
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
 
+def limpiar():
+    os.system("cls" if os.name == "nt" else "clear")
+
 def validar_n():
     """Solicita y valida el número de vértices entre 5 y 15"""
     while True:
         try:
-            n = int(input("Ingrese el número de vértices n (5 <= n <= 15): "))
+            n = int(input("Ingrese el número de vértices n (5 - 15): "))
             if 5 <= n <= 15:
                 return n
             else:
@@ -20,7 +24,7 @@ def generar_matriz_automatica(n):
     matriz = np.zeros((n, n), dtype=int)
     for i in range(n):
         for j in range(i + 1, n):
-            # 30% de probabilidad de no haber conexión (representado por 0)
+            # 30% de probabilidad de no haber conexión 
             if random.random() > 0.3:
                 peso = random.randint(1, 50)
                 matriz[i][j] = peso
@@ -46,7 +50,7 @@ def ingresar_matriz_manual(n):
                     print("Error: Ingrese un número entero")
     return matriz
 
-def mostrar_grafo(matriz, n, camino=None):
+def mostrar_grafo(matriz, n, camino=None, titulo="Grafo Ponderado"):
     """Genera y muestra el grafo ponderado correspondiente"""
     G = nx.Graph()
     for i in range(n):
@@ -59,6 +63,7 @@ def mostrar_grafo(matriz, n, camino=None):
 
     pos = nx.spring_layout(G, seed=42)
     plt.figure(figsize=(8, 6))
+    plt.suptitle(titulo, fontsize=14, fontweight= 'bold')
     
     # Dibujar nodos y aristas base
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=700, font_weight='bold')
@@ -77,7 +82,7 @@ def mostrar_grafo(matriz, n, camino=None):
     plt.show(block=True) # El parámetro block=True detiene la consola hasta que cierres la ventana
 
 def dijkstra(matriz, origen, destino, n):
-    """Encuentra el camino mínimo y su costo. (Base para futura mejora visual)"""
+    """Encuentra el camino mínimo y su costo. """
     import heapq
     distancias = {i: float('inf') for i in range(n)}
     distancias[origen] = 0
@@ -111,14 +116,21 @@ def dijkstra(matriz, origen, destino, n):
     
     return camino, distancias[destino]
 
-def main():
-    print("--- SISTEMA DE CAMINO MÍNIMO ---")
-    n = validar_n()
+def caratula():
+    limpiar()
+    print("="*50)
+    print("PRIMER ENTREGABLE".center(50))
+    print("APLICACIÓN DEL ALGORITMO DE DIJKSTRA EN".center(50))
+    print("LA SOLUCION DEL PROBLEMA DE CAMINO MINIMO".center(50))
+    print("="*50)
+    print("Curso: MATEMATICA COMPUTACIONAL".center(50))
+    print("Profesor: Antonio Marcos Medina Martinez".center(50))
+    print("Seccion: 3215".center(50))
+    print("-"*50)
 
-    print("\nMétodo de construcción de la matriz:")
-    print("1. Generación automática")
-    print("2. Ingreso manual")
-    
+def main():
+    caratula()
+    input("Presione para continuar... ")
     while True:
         opcion = input("Seleccione una opción (1 o 2): ")
         if opcion == '1':
@@ -153,7 +165,11 @@ def main():
         except (ValueError, TypeError):
             print("Error: Ingrese letras válidas")
 
-    camino, costo = dijkstra(matriz, origen, destino, n)
+        print("\nMatriz generada:")
+        print(matriz)
+        
+        # Muestra el grafo generado
+        mostrar_grafo(matriz, n)
 
     if camino:
         camino_letras = [chr(65 + nodo) for nodo in camino]
