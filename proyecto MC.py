@@ -2,7 +2,6 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
-import sys
 
 def validar_n():
     """Solicita y valida el número de vértices entre 5 y 15"""
@@ -36,7 +35,7 @@ def ingresar_matriz_manual(n):
         for j in range(i + 1, n):
             while True:
                 try:
-                    peso = int(input(f"Peso de la arista entre el vértice {i} y {j}: "))
+                    peso = int(input(f"Peso de la arista entre el vértice {chr(65+i)} y {chr(65+j)}: "))
                     if peso >= 0:
                         matriz[i][j] = peso
                         matriz[j][i] = peso
@@ -51,10 +50,12 @@ def mostrar_grafo(matriz, n, camino=None):
     """Genera y muestra el grafo ponderado correspondiente"""
     G = nx.Graph()
     for i in range(n):
-        G.add_node(i)
+        nodo_i = chr(65 + i) # Nodo origen en letra
+        G.add_node(nodo_i)
         for j in range(i + 1, n):
             if matriz[i][j] > 0:
-                G.add_edge(i, j, weight=matriz[i][j])
+                nodo_j = chr(65 + j) # Nodo destino en letra
+                G.add_edge(nodo_i, nodo_j, weight=matriz[i][j])
 
     pos = nx.spring_layout(G, seed=42)
     plt.figure(figsize=(8, 6))
@@ -66,13 +67,14 @@ def mostrar_grafo(matriz, n, camino=None):
 
     # Resaltar el camino mínimo si existe
     if camino:
-        edges_camino = [(camino[i], camino[i+1]) for i in range(len(camino)-1)]
+        camino_letras = [chr(65 + nodo) for nodo in camino]
+        edges_camino = [(camino_letras[i], camino_letras[i+1]) for i in range(len(camino_letras)-1)]
         nx.draw_networkx_edges(G, pos, edgelist=edges_camino, edge_color='red', width=2.5)
-        nx.draw_networkx_nodes(G, pos, nodelist=camino, node_color='lightgreen', node_size=700)
+        nx.draw_networkx_nodes(G, pos, nodelist=camino_letras, node_color='lightgreen', node_size=700)
 
     plt.title("Grafo Ponderado")
     plt.axis('off')
-    plt.show()
+    plt.show(block=True) # El parámetro block=True detiene la consola hasta que cierres la ventana
 
 def dijkstra(matriz, origen, destino, n):
     """Encuentra el camino mínimo y su costo. (Base para futura mejora visual)"""
@@ -136,20 +138,27 @@ def main():
 
     while True:
         try:
-            origen = int(input(f"\nIngrese el vértice de origen (0 a {n-1}): "))
-            destino = int(input(f"Ingrese el vértice de destino (0 a {n-1}): "))
+            letra_max = chr(65 + n - 1)
+            origen_str = input(f"\nIngrese el vértice de origen (A hasta {letra_max}): ").upper()
+            destino_str = input(f"Ingrese el vértice de destino (A hasta {letra_max}): ").upper()
+            
+            # Convertimos la letra ingresada de vuelta a un índice numérico (A->0, B->1...)
+            origen = ord(origen_str) - 65
+            destino = ord(destino_str) - 65
+            
             if 0 <= origen < n and 0 <= destino < n:
                 break
             else:
-                print(f"Error: Los vértices deben estar entre 0 y {n-1}")
-        except ValueError:
-            print("Error: Ingrese valores enteros")
+                print(f"Error: Los vértices deben estar entre A y {letra_max}")
+        except (ValueError, TypeError):
+            print("Error: Ingrese letras válidas")
 
     camino, costo = dijkstra(matriz, origen, destino, n)
 
     if camino:
+        camino_letras = [chr(65 + nodo) for nodo in camino]
         print(f"\nResultado:")
-        print(f"Secuencia de vértices del camino mínimo: {camino}")
+        print(f"Secuencia de vértices del camino mínimo: {camino_letras}")
         print(f"Costo total del recorrido: {costo}")
         # Muestra el grafo con el camino resaltado
         mostrar_grafo(matriz, n, camino)
